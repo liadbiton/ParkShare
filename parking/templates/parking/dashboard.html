@@ -1,28 +1,27 @@
-{% extends 'parking\base.html' %}
-{% block content %}
-<h2>Welcome, {{ user.username }}</h2>
-<h3>Apartment Details</h3>
-<p>Apartment Number: {{ apartment.apartment_number }}</p>
-<p>Building: {{ apartment.building_name }}</p>
+<h1>Welcome, {{ user.username }}</h1>
 
-<h3>Your Cars</h3>
-{% if cars %}
-    <ul>
-        {% for car in cars %}
-            <li>Car Number: {{ car.car_number }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>You do not have any cars associated with your apartment yet.</p>
-{% endif %}
+{% if apartment %}
+  <h2>Apartment Details</h2>
+  <p>Apartment Number: {{ apartment.apartment_number }}</p>
+  <p>Building: {{ apartment.building_name }}</p>
 
-<h3>Your Parking Spots</h3>
-<ul>
-    {% for spot in parking_spots %}
-        <li>{{ spot.spot_number }} on Floor {{ spot.floor }} - Free: {{ spot.is_free }}</li>
+  <h2>Your Cars</h2>
+  <ul>
+    {% for car in cars %}
+      <li>{{ car.car_number }}</li>
+    {% empty %}
+      <li>You have no cars assigned.</li>
     {% endfor %}
-</ul>
+  </ul>
 
-<a href="{% url 'add_car' %}" class="btn btn-primary">Add a Car</a>
-<a href="{% url 'mark_parking_spot_free' %}" class="btn btn-secondary">Mark Parking Spot as Free</a>
-{% endblock %}
+  <h2>Your Parking Spots</h2>
+  <ul>
+    {% for spot in parking_spots %}
+      <li>Spot {{ spot.spot_number }} in {{ spot.location }}</li>
+    {% empty %}
+      <li>You have no parking spots assigned.</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You have no apartment assigned.</p>
+{% endif %}

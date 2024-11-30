@@ -12,14 +12,32 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            return redirect('home')
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+
+            # Assign apartment, cars, and parking spots
+            apartment = form.cleaned_data['apartment']
+            cars = form.cleaned_data['cars']
+            parking_spots = form.cleaned_data['parking_spots']
+
+            # Assign the apartment to the user
+            apartment.user = user
+            apartment.save()
+
+            # Add cars to the apartment
+            for car in cars:
+                apartment.cars.add(car)
+
+            # Mark parking spots as assigned
+            for spot in parking_spots:
+                spot.is_occupied = True
+                spot.save()
+
+            return redirect('login')
     else:
         form = UserRegistrationForm()
+
     return render(request, 'registration/register.html', {'form': form})
 
 
@@ -73,11 +91,17 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    if not hasattr(request.user, 'apartment'):
-        return redirect('assign_apartment')  # Redirect to assign apartment page if the user has no apartment
+    try:
+        apartment = request.user.apartment
+    except Apartment.DoesNotExist:
+        apartment = None
 
-    apartment = request.user.apartment
-    return render(request, 'parking/dashboard.html', {'apartment': apartment})
+    return render(request, 'parking/dashboard.html', {
+        'user': request.user,
+        'apartment': apartment,
+        'cars': apartment.cars.all() if apartment else [],
+        'parking_spots': ParkingSpot.objects.filter(user=request.user) if apartment else [],
+    })
 
 
 @login_required
