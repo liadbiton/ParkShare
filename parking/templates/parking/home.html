@@ -1,0 +1,9 @@
+<h2>Parking Spots</h2>
+<ul>
+    {% for spot in parking_spots %}
+        <li>{{ spot.spot_number }} on Floor {{ spot.floor }} - Free: {{ spot.is_free }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_car' %}">Add a Car</a><br>
+<a href="{% url 'mark_parking_spot_free' %}">Mark Parking Spot as Free</a><br>
+<a href="{% url 'register' %}">Register a New Account</a>

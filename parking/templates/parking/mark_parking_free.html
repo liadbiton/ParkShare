@@ -1,0 +1,6 @@
+<h2>Mark Parking Spot Free</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Mark as Free</button>
+</form>
